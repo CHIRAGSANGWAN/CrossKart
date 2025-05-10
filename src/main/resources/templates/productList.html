@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Amazon Products</title>
+</head>
+<body>
+<h1>Amazon Products</h1>
+<ul>
+    <th:block th:each="product : ${products}">
+        <li>
+            <p>Name: <span th:text="${product.name}"></span></p>
+            <p>Brand: <span th:text="${product.brand}"></span></p>
+            <p><img th:src="${product.imageUrl}" alt="Product Image"></p>
+            <p>Price: <span th:text="${product.price}"></span></p>
+            <p>Original Price: <span th:text="${product.originalPrice}"></span></p>
+            <p>Discount: <span th:text="${product.discount}"></span></p>
+            <p>Rating: <span th:text="${product.rating}"></span></p>
+            <p><a th:href="${product.productUrl}" target="_blank">Product Link</a></p>
+        </li>
+    </th:block>
+</ul>
+</body>
+</html>
