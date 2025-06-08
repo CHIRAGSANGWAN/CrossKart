@@ -45,15 +45,36 @@ public class FlipKartController {
         List<Product> products = new ArrayList<>();
 
         try {
-            for (int page = 1; page <= 3; page++) { // Set to as many pages as you want
+            for (int page = 1; page <= 3; page++) {
                 String url = "https://www.flipkart.com/search?q=" + query + "&page=" + page;
+                int attempts = 0;
+                boolean success = false;
 
-                Document doc = Jsoup.connect(url)
-                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
-                        .timeout(10000)
-                        .get();
+                while (attempts < 5 && !success) {
+                    try {
+                        Document doc = Jsoup.connect(url)
+                                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36")
+                                .timeout(10000)
+                                .get();
 
-                extractImagesAndText(doc.toString(), products);
+                        extractImagesAndText(doc.toString(), products);
+                        success = true;
+                    } catch (Exception e) {
+                        attempts++;
+                        System.err.println("Attempt " + attempts + " failed for page " + page + ": " + e.getMessage());
+
+                        if (attempts >= 5) {
+                            break;
+                        }
+
+                        try {
+                            Thread.sleep(1000); // 2 seconds
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,6 +83,7 @@ public class FlipKartController {
         model.addAttribute("products", products);
         return "productList";
     }
+
     public static void extractImagesAndText(String html,List<Product> products) {
         // Split by the image indicator
         String[] parts = html.split("alt=\"\" src=\"https://");
